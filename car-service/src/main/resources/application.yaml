@@ -1,0 +1,27 @@
+server:
+  port: 0
+
+
+spring:
+  application:
+    name: car-service
+
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+      maxLifetime: 300000
+      minimumIdle: 5
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/car-rental-microservices?currentSchema=car_service
+    username: postgres
+    password: postgres
+
+  flyway:
+    schemas: car_service
+    user: postgres
+    password: postgres
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka

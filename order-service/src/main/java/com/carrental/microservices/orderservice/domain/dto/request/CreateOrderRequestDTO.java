@@ -1,0 +1,51 @@
+package com.carrental.microservices.orderservice.domain.dto.request;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_UUID;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_UUID_DESCRIPTION;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.ORDER_RENTAL_PERIOD;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.ORDER_RENTAL_PERIOD_DESCRIPTION;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.USER_UUID;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.USER_UUID_DESCRIPTION;
+
+/**
+ * This class presents a DTO, which is available via OrderController endpoints.
+ */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class CreateOrderRequestDTO {
+
+    @NotNull(message = "Please fill the rental period")
+    @Min(value = 1, message = "Rental period should be greater than 1")
+    @Schema(example = ORDER_RENTAL_PERIOD, description = ORDER_RENTAL_PERIOD_DESCRIPTION)
+    @JsonProperty(value = "rental_period")
+    private Integer rentalPeriod;
+
+    @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
+            message = "Invalid car id")
+    @NotBlank(message = "Car id can't be null")
+    @Schema(example = CAR_UUID, description = CAR_UUID_DESCRIPTION)
+    @JsonProperty(value = "car_id")
+    private String carId;
+
+    @Pattern(regexp = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}",
+            message = "Invalid user id")
+    @NotBlank(message = "User id can't be null")
+    @Schema(example = USER_UUID, description = USER_UUID_DESCRIPTION)
+    @JsonProperty(value = "user_id")
+    private String userId;
+
+}
+
