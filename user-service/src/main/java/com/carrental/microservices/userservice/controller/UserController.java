@@ -1,7 +1,6 @@
 package com.carrental.microservices.userservice.controller;
 
 import com.carrental.microservices.userservice.domain.dto.request.PassportRequestDTO;
-import com.carrental.microservices.userservice.domain.dto.response.OrderResponseDTO;
 import com.carrental.microservices.userservice.domain.dto.response.PassportResponseDTO;
 import com.carrental.microservices.userservice.domain.dto.response.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -116,29 +115,6 @@ public interface UserController {
     })
     @PatchMapping("/{id}/unlock")
     ResponseEntity<UserResponseDTO> unlockUser(
-            @PathVariable("id") UUID userId);
-
-    @Operation(
-            summary = "Find user's orders",
-            description = "This endpoint allows you to get user's orders by user's id from database")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200",
-                    description = "Found the following orders",
-                    content = {@Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = OrderResponseDTO.class)))}),
-            @ApiResponse(responseCode = "400",
-                    description = "Bed request",
-                    content = {@Content(schema = @Schema())}),
-            @ApiResponse(responseCode = "404",
-                    description = "Not found",
-                    content = {@Content(schema = @Schema())}),
-            @ApiResponse(responseCode = "500",
-                    description = "Internal server error",
-                    content = {@Content(schema = @Schema())})
-    })
-    @GetMapping("/{id}/orders")
-    ResponseEntity<Page<OrderResponseDTO>> findUsersOrders(
-            @ParameterObject @PageableDefault Pageable pageable,
             @PathVariable("id") UUID userId);
 
     @Operation(

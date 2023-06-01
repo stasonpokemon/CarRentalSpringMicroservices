@@ -40,38 +40,38 @@ import static com.carrental.microservices.carservice.util.swagger.OpenApiConstan
 @Builder
 public class CarResponseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_UUID, description = CAR_UUID_DESCRIPTION)
+    @JsonProperty(value = "car_id")
     private UUID id;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_PRODUCER, description = CAR_PRODUCER_DESCRIPTION)
+    @JsonProperty(value = "producer")
     private String producer;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_MODEL, description = CAR_MODEL_DESCRIPTION)
+    @JsonProperty(value = "model")
     private String model;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_RELEASE_DATE, description = CAR_RELEASE_DATE_DESCRIPTION)
+    @JsonProperty(value = "release_date")
     private LocalDate releaseDate;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_PRICE_PER_DAY, description = CAR_PRICE_PER_DAY_DESCRIPTION)
+    @JsonProperty(value = "price_per_day")
     private Double pricePerDay;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_EMPLOYMENT_STATUS, description = CAR_EMPLOYMENT_STATUS_DESCRIPTION)
+    @JsonProperty(value = "is_busy")
     private boolean busy;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_DAMAGE_STATUS, description = CAR_DAMAGE_STATUS_DESCRIPTION)
+    @JsonProperty(value = "damage_status")
     private String damageStatus;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_IMAGE_LINK, description = CAR_IMAGE_LINK_DESCRIPTION)
+    @JsonProperty(value = "image_link")
     private String imageLink;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = CAR_BROKEN, description = CAR_BROKEN_DESCRIPTION)
+    @JsonProperty(value = "is_broken")
     private boolean broken;
 }

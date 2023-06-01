@@ -32,27 +32,27 @@ import static com.carrental.microservices.userservice.util.swagger.OpenApiConsta
 @Builder
 public class UserResponseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_UUID, description = USER_UUID_DESCRIPTION)
+    @JsonProperty(value = "user_id")
     private UUID id;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_USERNAME, description = USER_USERNAME_DESCRIPTION)
+    @JsonProperty(value = "username")
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_PASSWORD, description = USER_PASSWORD_DESCRIPTION)
+    @JsonProperty(value = "password")
     private String password;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_EMAIL, description = USER_EMAIL_DESCRIPTION)
+    @JsonProperty(value = "email")
     private String email;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_ACTIVE, description = USER_ACTIVE_DESCRIPTION)
+    @JsonProperty(value = "active")
     private boolean active;
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = PASSPORT_UUID, description = PASSPORT_UUID_DESCRIPTION)
+    @JsonProperty(value = "passport_id")
     private UUID passportId;
 }

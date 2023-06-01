@@ -2,7 +2,6 @@ package com.carrental.microservices.userservice.controller.impl;
 
 import com.carrental.microservices.userservice.controller.UserController;
 import com.carrental.microservices.userservice.domain.dto.request.PassportRequestDTO;
-import com.carrental.microservices.userservice.domain.dto.response.OrderResponseDTO;
 import com.carrental.microservices.userservice.domain.dto.response.PassportResponseDTO;
 import com.carrental.microservices.userservice.domain.dto.response.UserResponseDTO;
 import com.carrental.microservices.userservice.service.UserService;
@@ -24,8 +23,6 @@ import java.util.UUID;
 public class UserControllerImpl implements UserController {
 
     private final UserService userService;
-
-//    private final OrderService orderService;
 
     @Override
     public ResponseEntity<Page<UserResponseDTO>> findAll(Pageable pageable) {
@@ -57,16 +54,6 @@ public class UserControllerImpl implements UserController {
         log.info("PATCH request to unlock user with id: {}", userId);
 
         return userService.unlockUser(userId);
-    }
-
-    @Override
-    public ResponseEntity<Page<OrderResponseDTO>> findUsersOrders(Pageable pageable,
-                                                                  UUID userId) {
-
-        log.info("GET request to find user's orders by userId: {}", userId);
-
-//        return orderService.findOrdersByUserId(userId, pageable);
-        return null;
     }
 
     @Override

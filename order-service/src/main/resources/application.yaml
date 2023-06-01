@@ -33,3 +33,17 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 
+
+openapi:
+  service:
+    title: Order service documentation #title that you will want to display in the swagger ui
+    version: 1.0.0
+    description: This is the API for the Order Service of the CarRental project
+    url: http://localhost:8765 #api gateway url
+
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,7 +17,9 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -68,7 +71,14 @@ public interface CarController {
                     content = {@Content(schema = @Schema())}),
             @ApiResponse(responseCode = "404",
                     description = "Not found",
-                    content = {@Content(schema = @Schema())}),
+                    content = {@Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            examples = {
+                                    @ExampleObject(
+                                            value = "{\"timestamp\": \"2023-02-18T01:20:33.0725725\","
+                                                            + "\"message\": \"Not found Car with id: " +
+                                                    "695fedf4-bd75-4b38-bfcc-5f498b333021\"}")}
+                    )}),
             @ApiResponse(responseCode = "500",
                     description = "Internal server error",
                     content = {@Content(schema = @Schema())})
@@ -191,7 +201,7 @@ public interface CarController {
                     description = "Internal server error",
                     content = {@Content(schema = @Schema())})
     })
-    @PatchMapping("/{id}/remove")
+    @DeleteMapping("/{id}")
     ResponseEntity<CarResponseDTO> markCarAsDeleted(
             @PathVariable("id") UUID carId);
 }

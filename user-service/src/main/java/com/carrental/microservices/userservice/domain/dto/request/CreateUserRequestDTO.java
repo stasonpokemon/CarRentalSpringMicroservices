@@ -29,16 +29,18 @@ public class CreateUserRequestDTO {
 
     @Length(min = 6, message = "Username must be more than 6 symbols")
     @Schema(example = USER_USERNAME, description = USER_USERNAME_DESCRIPTION)
+    @JsonProperty(value = "username")
     private String username;
 
     @Length(min = 6, message = "Password must be more than 6 symbols")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Schema(example = USER_PASSWORD, description = USER_PASSWORD_DESCRIPTION)
+    @JsonProperty(value = "password")
     private String password;
 
     @NotBlank(message = "Please fill the email")
     @Email(message = "Please fill the correct email")
     @Schema(example = USER_EMAIL, description = USER_EMAIL_DESCRIPTION)
+    @JsonProperty(value = "email")
     private String email;
 }
 

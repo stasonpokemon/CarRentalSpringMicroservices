@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO findUserById(UUID userId) {
 
         log.info("Trying to find a user with id: {}", userId);
+
         UserResponseDTO user;
 
         try {
@@ -44,6 +45,8 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO findUserWithPassportById(UUID userId) {
 
         UserResponseDTO user = findUserById(userId);
+
+        log.info("User: {}", user);
 
         if (user.getPassportId() == null) {
             throw new BadRequestException("The user must have a passport to create a new order");

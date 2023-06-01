@@ -1,5 +1,6 @@
 package com.carrental.microservices.carservice.domain.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -40,33 +41,40 @@ public class UpdateCarRequestDTO {
     @NotBlank(message = "Please fill the producer")
     @Length(max = 255, message = "Producer too long. Max length is 2048")
     @Schema(example = CAR_PRODUCER, description = CAR_PRODUCER_DESCRIPTION)
+    @JsonProperty(namespace = "producer")
     private String producer;
 
     @NotBlank(message = "Please fill the model")
     @Length(max = 255, message = "Model too long. Max length is 2048")
     @Schema(example = CAR_MODEL, description = CAR_MODEL_DESCRIPTION)
+    @JsonProperty(namespace = "model")
     private String model;
 
     @NotNull(message = "Please fill the release date")
     @Schema(example = CAR_RELEASE_DATE, description = CAR_RELEASE_DATE_DESCRIPTION)
+    @JsonProperty(namespace = "release_date")
     private LocalDate releaseDate;
 
     @NotNull(message = "Please fill the price per day")
     @Min(value = 0, message = "Price per day can't be less than 0")
     @Schema(example = CAR_PRICE_PER_DAY, description = CAR_PRICE_PER_DAY_DESCRIPTION)
+    @JsonProperty(namespace = "price_per_day")
     private Double pricePerDay;
 
     @NotNull(message = "Employment status can't be null")
     @Schema(example = CAR_EMPLOYMENT_STATUS, description = CAR_EMPLOYMENT_STATUS_DESCRIPTION)
+    @JsonProperty(namespace = "is_busy")
     private boolean busy;
 
     @Length(max = 255, message = "Damage status too long. Max length is 1000")
     @NotBlank(message = "Please fill the damage status")
     @Schema(example = CAR_DAMAGE_STATUS, description = CAR_DAMAGE_STATUS_DESCRIPTION)
+    @JsonProperty(namespace = "damage_status")
     private String damageStatus;
 
     @NotBlank(message = "Please fill the image link")
     @Schema(example = CAR_IMAGE_LINK, description = CAR_IMAGE_LINK_DESCRIPTION)
+    @JsonProperty(namespace = "image_link")
     private String imageLink;
 }
 

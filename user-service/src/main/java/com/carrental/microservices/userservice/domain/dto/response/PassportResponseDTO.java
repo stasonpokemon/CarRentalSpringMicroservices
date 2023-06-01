@@ -36,34 +36,39 @@ import static com.carrental.microservices.userservice.util.swagger.OpenApiConsta
 @NoArgsConstructor
 public class PassportResponseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(example = PASSPORT_UUID, description = PASSPORT_UUID_DESCRIPTION)
+    @JsonProperty(value = "user_id")
     private UUID id;
     @Length(max = 255, message = "Name too long. Max length is 255")
     @NotBlank(message = "Please fill the name")
     @Schema(example = PASSPORT_NAME, description = PASSPORT_NAME_DESCRIPTION)
+    @JsonProperty(value = "name")
     private String name;
 
     @Length(max = 255, message = "Surname too long. Max length is 255")
     @NotBlank(message = "Please fill the surname")
     @Schema(example = PASSPORT_SURNAME, description = PASSPORT_SURNAME_DESCRIPTION)
+    @JsonProperty(value = "surname")
     private String surname;
 
     @Length(max = 255, message = "Patronymic too long. Max length is 255")
     @NotBlank(message = "Please fill the patronymic")
     @Schema(example = PASSPORT_PATRONYMIC, description = PASSPORT_PATRONYMIC_DESCRIPTION)
+    @JsonProperty(value = "patronymic")
     private String patronymic;
 
     @NotNull(message = "Please fill the birthday")
     @Schema(example = PASSPORT_BIRTHDAY, description = PASSPORT_BIRTHDAY_DESCRIPTION)
+    @JsonProperty(value = "birthday")
     private Date birthday;
 
     @Length(max = 500, message = "Address too long. Max length is 500")
     @NotBlank(message = "Please fill the address")
     @Schema(example = PASSPORT_ADDRESS, description = PASSPORT_ADDRESS_DESCRIPTION)
+    @JsonProperty(value = "address")
     private String address;
 
-    @JsonProperty(namespace = "userId", access = JsonProperty.Access.READ_ONLY)
     @Schema(example = USER_UUID, description = USER_UUID_DESCRIPTION)
+    @JsonProperty(value = "user_id", access = JsonProperty.Access.READ_ONLY)
     private UUID userId;
 }
