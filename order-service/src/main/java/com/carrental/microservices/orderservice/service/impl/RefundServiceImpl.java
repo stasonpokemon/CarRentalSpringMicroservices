@@ -1,23 +1,23 @@
 package com.carrental.microservices.orderservice.service.impl;
 
-import com.carrental.microservices.orderservice.domain.entity.Order;
-import com.carrental.microservices.orderservice.domain.entity.OrderStatus;
-import com.carrental.microservices.orderservice.domain.entity.Refund;
 import com.carrental.microservices.orderservice.domain.dto.request.CreateRefundRequestDTO;
 import com.carrental.microservices.orderservice.domain.dto.response.RefundResponseDTO;
+import com.carrental.microservices.orderservice.domain.entity.Order;
+import com.carrental.microservices.orderservice.domain.entity.Refund;
 import com.carrental.microservices.orderservice.domain.mapper.RefundMapper;
-import com.carrental.microservices.orderservice.exception.BadRequestException;
 import com.carrental.microservices.orderservice.exception.NotFoundException;
 import com.carrental.microservices.orderservice.repo.OrderRepository;
 import com.carrental.microservices.orderservice.service.CarService;
 import com.carrental.microservices.orderservice.service.OrderService;
 import com.carrental.microservices.orderservice.service.RefundService;
+import com.carrental.microservices.orderservice.util.Extractor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -28,7 +28,6 @@ import java.util.UUID;
  */
 @Service
 @Slf4j
-@Transactional
 public class RefundServiceImpl implements RefundService {
 
     private final RefundService refundService;
@@ -52,17 +51,8 @@ public class RefundServiceImpl implements RefundService {
 
 
     @Override
-    public Refund saveNewRefundWithoutDamage(CreateRefundRequestDTO createRefundRequestDTO) {
-        UUID orderId = UUID.fromString(createRefundRequestDTO.getOrderId());
-
-        Order order = orderService.findOrderWithoutRefundById(orderId);
-
-        if (!order.getOrderStatus().equals(OrderStatus.CONFIRMED)){
-            throw new BadRequestException("Order with id: %s has status - %s"
-                    .formatted(orderId, order.getOrderStatus()));
-        }
-
-        Refund refund = refundMapper.createRefundRequestDTOToRefund(createRefundRequestDTO);
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Refund saveNewRefundWithoutDamage(Refund refund, Order order) {
         refund.setRefundDate(LocalDateTime.now());
         refund.setPrice(0);
         refund.setDamageDescription("");
@@ -74,17 +64,8 @@ public class RefundServiceImpl implements RefundService {
     }
 
     @Override
-    public Refund saveNewRefundWithDamage(CreateRefundRequestDTO createRefundRequestDTO) {
-        UUID orderId = UUID.fromString(createRefundRequestDTO.getOrderId());
-
-        Order order = orderService.findOrderWithoutRefundById(orderId);
-
-        if (!order.getOrderStatus().equals(OrderStatus.CONFIRMED)){
-            throw new BadRequestException("Order with id: %s has status - %s"
-                    .formatted(orderId, order.getOrderStatus()));
-        }
-
-        Refund refund = refundMapper.createRefundRequestDTOToRefund(createRefundRequestDTO);
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Refund saveNewRefundWithDamage(Refund refund, Order order) {
         refund.setRefundDate(LocalDateTime.now());
         refund.setOrder(order);
 
@@ -97,7 +78,7 @@ public class RefundServiceImpl implements RefundService {
     @Transactional(readOnly = true)
     public ResponseEntity<RefundResponseDTO> findRefundByOrderId(UUID orderId) {
 
-        log.info("Finding order's refund by orderId: {}", orderId);
+        log.info("Trying to find order's refund by orderId: {}", orderId);
 
         Order order = orderService.findOrderByIdOrThrowException(orderId);
 
@@ -110,7 +91,7 @@ public class RefundServiceImpl implements RefundService {
 
         ResponseEntity<RefundResponseDTO> response = new ResponseEntity<>(refundResponseDTO, HttpStatus.OK);
 
-        log.info("Find order's refund: {} by orderId: {}", refundResponseDTO, orderId);
+        log.info("Fond order's refund: {}", refundResponseDTO);
 
         return response;
     }
@@ -118,20 +99,24 @@ public class RefundServiceImpl implements RefundService {
     @Override
     public ResponseEntity<RefundResponseDTO> createRefund(CreateRefundRequestDTO createRefundRequestDTO) {
 
-        log.info("Creating refund: {}", createRefundRequestDTO);
+        log.info("Trying to create refund: {}", createRefundRequestDTO);
 
-        Refund refund;
+        UUID orderId = Extractor.extractUUIDFromString(createRefundRequestDTO.getOrderId());
+
+        Order order = orderService.findOrderWithOrderStatusConfirmed(orderId);
+
+        Refund refund = refundMapper.createRefundRequestDTOToRefund(createRefundRequestDTO);
 
         if (!createRefundRequestDTO.getDamage()) {
 
-            refund = refundService.saveNewRefundWithoutDamage(createRefundRequestDTO);
+            refund = refundService.saveNewRefundWithoutDamage(refund, order);
 
             // todo kafka
             carService.updateCarStatusAsFree(refund.getOrder().getCarId());
 
         } else {
 
-            refund = refundService.saveNewRefundWithDamage(createRefundRequestDTO);
+            refund = refundService.saveNewRefundWithDamage(refund, order);
 
             // todo kafka
             carService.updateCarStatusAsBroken(refund.getOrder().getCarId(), refund.getDamageDescription());

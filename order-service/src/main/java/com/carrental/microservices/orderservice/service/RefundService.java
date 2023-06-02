@@ -1,5 +1,6 @@
 package com.carrental.microservices.orderservice.service;
 
+import com.carrental.microservices.orderservice.domain.entity.Order;
 import com.carrental.microservices.orderservice.domain.entity.Refund;
 import com.carrental.microservices.orderservice.domain.dto.request.CreateRefundRequestDTO;
 import com.carrental.microservices.orderservice.domain.dto.response.RefundResponseDTO;
@@ -9,9 +10,9 @@ import java.util.UUID;
 
 public interface RefundService {
 
-    Refund saveNewRefundWithoutDamage(CreateRefundRequestDTO createRefundRequestDTO);
+    Refund saveNewRefundWithoutDamage(Refund refund, Order order);
 
-    Refund saveNewRefundWithDamage(CreateRefundRequestDTO createRefundRequestDTO);
+    Refund saveNewRefundWithDamage(Refund refund, Order order);
 
     ResponseEntity<RefundResponseDTO> findRefundByOrderId(UUID orderId);
 

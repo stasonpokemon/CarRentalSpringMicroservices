@@ -13,6 +13,7 @@ import com.carrental.microservices.orderservice.repo.OrderRepository;
 import com.carrental.microservices.orderservice.service.CarService;
 import com.carrental.microservices.orderservice.service.OrderService;
 import com.carrental.microservices.orderservice.service.UserService;
+import com.carrental.microservices.orderservice.util.Extractor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.context.annotation.Lazy;
@@ -85,8 +86,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Order findOrderWithOrderStatusConfirmed(UUID orderId) {
+        Order order = findOrderWithoutRefundById(orderId);
+
+        if (!order.getOrderStatus().equals(OrderStatus.CONFIRMED)) {
+            throw new BadRequestException("Order with id: %s has status - %s"
+                    .formatted(orderId, order.getOrderStatus()));
+        }
+
+        return order;
+    }
+
+    @Override
+    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    public Order findOrderWithOrderStatusUnderConsideration(UUID orderId) {
+        Order order = findOrderWithoutRefundById(orderId);
+
+        if (!order.getOrderStatus().equals(OrderStatus.UNDER_CONSIDERATION)) {
+            throw new BadRequestException(
+                    String.format("Order with id = %s isn't under consideration", orderId));
+        }
+
+        return order;
+    }
+
+
+    @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<Page<OrderResponseDTO>> findAll(Pageable pageable) {
+    public ResponseEntity<Page<OrderResponseDTO>> findAllOrders(Pageable pageable) {
 
         log.info("Finding all orders");
 
@@ -104,8 +132,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<Page<OrderResponseDTO>> findOrdersByUserId(UUID userId,
-                                                                     Pageable pageable) {
+    public ResponseEntity<Page<OrderResponseDTO>> findAllOrdersByUserId(UUID userId,
+                                                                        Pageable pageable) {
 
         log.info("Finding all orders by user id: {}", userId);
 
@@ -128,17 +156,33 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public ResponseEntity<OrderResponseDTO> createOrder(CreateOrderRequestDTO createOrderRequestDTO) {
 
-        Order savedOrder = orderService.saveNewOrderAndSetOrderStatusUnderConsideration(createOrderRequestDTO);
+        log.info("Creating new order: {}", createOrderRequestDTO);
+
+
+        UUID carId = Extractor.extractUUIDFromString(createOrderRequestDTO.getCarId());
+        UUID userId = Extractor.extractUUIDFromString(createOrderRequestDTO.getUserId());
+
+        UserResponseDTO user = userService.findUserWithPassportById(userId);
+
+        log.info("Found user: {}", user);
+
+        CarResponseDTO car = carService.findRepairedAndFreeCarById(carId);
+
+        log.info("Found car: {}", car);
+
+        Order order = orderMapper.createOrderRequestDTOToOrder(createOrderRequestDTO);
+
+        order = orderService.saveNewOrderWithOrderStatusUnderConsideration(order, car, userId);
 
         // todo С ПОМОЩЬЮ kafka
-        carService.updateCarStatusAsBusy(savedOrder.getCarId());
+        carService.updateCarStatusAsBusy(order.getCarId());
 
-        OrderResponseDTO orderResponseDTO = orderMapper.orderToOrderResponseDTO(savedOrder);
+        OrderResponseDTO orderResponseDTO = orderMapper.orderToOrderResponseDTO(order);
 
         ResponseEntity<OrderResponseDTO> response =
                 new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
 
-        log.info("Creat new order: {}", savedOrder);
+        log.info("Creat new order: {}", order);
 
         return response;
     }
@@ -150,12 +194,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Accepting order with id: {}", orderId);
 
-        Order order = findOrderByIdOrThrowException(orderId);
-
-        if (!order.getOrderStatus().equals(OrderStatus.UNDER_CONSIDERATION)) {
-            throw new BadRequestException(
-                    String.format("Order with id = %s already accepted or canceled", orderId));
-        }
+        Order order = findOrderWithOrderStatusUnderConsideration(orderId);
 
         order.setOrderStatus(OrderStatus.CONFIRMED);
 
@@ -173,7 +212,9 @@ public class OrderServiceImpl implements OrderService {
         // Обновление заказа transactional
         log.info("Canceling order with id: {}", orderId);
 
-        Order order = orderService.setOrderStatusRefusal(orderId);
+        Order order = findOrderWithOrderStatusUnderConsideration(orderId);
+
+        order = orderService.setOrderStatusRefusal(order);
 
         log.info("Successful setting order status as refusal");
 
@@ -196,16 +237,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order setOrderStatusRefusal(UUID orderId) {
+    public Order setOrderStatusRefusal(Order order) {
 
         log.info("Trying to set order status as refusal");
-
-        Order order = findOrderByIdOrThrowException(orderId);
-
-        if (!order.getOrderStatus().equals(OrderStatus.UNDER_CONSIDERATION)) {
-            throw new BadRequestException(
-                    String.format("Order with id = %s already accepted or canceled", order.getId()));
-        }
 
         order.setOrderStatus(OrderStatus.REFUSAL);
 
@@ -214,23 +248,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Order saveNewOrderAndSetOrderStatusUnderConsideration(CreateOrderRequestDTO createOrderRequestDTO) {
-
-        log.info("Creating new order: {}", createOrderRequestDTO);
-
-        UUID carId = UUID.fromString(createOrderRequestDTO.getCarId());
-        UUID userId = UUID.fromString(createOrderRequestDTO.getUserId());
-
-        UserResponseDTO user = userService.findUserWithPassportById(userId);
-
-        log.info("Found user: {}", user);
-
-        CarResponseDTO car = carService.findRepairedAndFreeCarById(carId);
-
-        log.info("Found car: {}", car);
-
-        Order order = orderMapper.createOrderRequestDTOToOrder(createOrderRequestDTO);
-        order.setCarId(carId);
+    public Order saveNewOrderWithOrderStatusUnderConsideration(Order order,
+                                                               CarResponseDTO car, UUID userId) {
+        order.setCarId(car.getId());
         order.setUserId(userId);
         order.setOrderStatus(OrderStatus.UNDER_CONSIDERATION);
         order.setOrderDate(LocalDateTime.now());
@@ -252,5 +272,5 @@ public class OrderServiceImpl implements OrderService {
 
         return order;
     }
-
 }
+

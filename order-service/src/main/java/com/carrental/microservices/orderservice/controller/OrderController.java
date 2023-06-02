@@ -1,7 +1,6 @@
 package com.carrental.microservices.orderservice.controller;
 
 import com.carrental.microservices.orderservice.domain.dto.request.CreateOrderRequestDTO;
-import com.carrental.microservices.orderservice.domain.dto.request.CreateRefundRequestDTO;
 import com.carrental.microservices.orderservice.domain.dto.response.OrderResponseDTO;
 import com.carrental.microservices.orderservice.domain.dto.response.RefundResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;

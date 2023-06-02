@@ -1,6 +1,7 @@
 package com.carrental.microservices.orderservice.service;
 
 import com.carrental.microservices.orderservice.domain.dto.request.CreateOrderRequestDTO;
+import com.carrental.microservices.orderservice.domain.dto.response.CarResponseDTO;
 import com.carrental.microservices.orderservice.domain.dto.response.OrderResponseDTO;
 import com.carrental.microservices.orderservice.domain.entity.Order;
 import org.springframework.data.domain.Page;
@@ -14,23 +15,27 @@ import java.util.UUID;
  */
 public interface OrderService {
 
-    ResponseEntity<Page<OrderResponseDTO>> findAll(Pageable pageable);
+    Order findOrderWithOrderStatusUnderConsideration(UUID orderId);
 
-    ResponseEntity<Page<OrderResponseDTO>> findOrdersByUserId(UUID userId, Pageable pageable);
+    ResponseEntity<Page<OrderResponseDTO>> findAllOrders(Pageable pageable);
+
+    ResponseEntity<Page<OrderResponseDTO>> findAllOrdersByUserId(UUID userId, Pageable pageable);
 
     ResponseEntity<OrderResponseDTO> findOrderById(UUID orderId);
 
     ResponseEntity<OrderResponseDTO> createOrder(CreateOrderRequestDTO createOrderRequestDTO);
 
-    Order saveNewOrderAndSetOrderStatusUnderConsideration(CreateOrderRequestDTO createOrderRequestDTO);
+    Order saveNewOrderWithOrderStatusUnderConsideration(Order order, CarResponseDTO car, UUID userId);
 
     ResponseEntity<OrderResponseDTO> acceptOrder(UUID orderId);
 
     ResponseEntity<OrderResponseDTO> cancelOrder(UUID orderId);
 
-    Order setOrderStatusRefusal(UUID orderId);
+    Order setOrderStatusRefusal(Order order);
 
     Order findOrderWithoutRefundById(UUID orderId);
 
     Order findOrderByIdOrThrowException(UUID orderId);
+
+    Order findOrderWithOrderStatusConfirmed(UUID orderId);
 }
