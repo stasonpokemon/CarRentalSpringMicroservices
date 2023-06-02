@@ -44,9 +44,11 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok-mapstruct-binding:$mapstructBindingVersion"
 
-//    implementation 'com.fasterxml.jackson.core:jackson-databind'
-//    implementation 'io.github.openfeign:feign-jackson'
     implementation 'io.github.openfeign:feign-hc5'
+
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.kafka:spring-kafka'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 
 }

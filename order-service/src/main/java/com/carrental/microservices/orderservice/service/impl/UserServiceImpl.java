@@ -38,19 +38,23 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Not Found user with id " + userId);
         }
 
+        log.info("Found user: {}", user);
+
         return user;
     }
 
     @Override
     public UserResponseDTO findUserWithPassportById(UUID userId) {
 
+        log.info("Trying to find user with passport by id: {}", userId);
+
         UserResponseDTO user = findUserById(userId);
 
-        log.info("User: {}", user);
-
         if (user.getPassportId() == null) {
-            throw new BadRequestException("The user must have a passport to create a new order");
+            throw new BadRequestException("The user: %s must have a passport to create a new order".formatted(user));
         }
+
+        log.info("Found user: {}", user);
 
         return user;
     }

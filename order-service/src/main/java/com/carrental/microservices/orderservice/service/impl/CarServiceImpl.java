@@ -26,21 +26,20 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarResponseDTO updateCarStatusAsFree(UUID carId) {
+
+        log.info("Trying to set car's status as free for car with id: {}", carId);
+
         CarResponseDTO updatedCar;
 
         try {
-
-            log.info("Trying to set car's status as free");
-
             updatedCar = carServiceFeignClient.updateCarStatusAsFree(carId);
-
-            log.info("Updated car: {}", updatedCar);
-
         } catch (FeignException.NotFound e) {
             throw new NotFoundException(e.getMessage());
         } catch (FeignException.BadRequest e) {
             throw new BadRequestException(e.getMessage());
         }
+
+        log.info("Updated car: {}", updatedCar);
 
         return updatedCar;
     }
@@ -49,38 +48,37 @@ public class CarServiceImpl implements CarService {
     public CarResponseDTO updateCarStatusAsBroken(UUID carId, String damageDescription) {
         CarResponseDTO updatedCar;
 
+        log.info("Trying to set car's status as broken for car with id: {}", carId);
+
         try {
-            log.info("Trying to set car's status as broken");
-
             updatedCar = carServiceFeignClient.setCarAsBroken(carId, damageDescription);
-
-            log.info("Updated car: {}", updatedCar);
-
         } catch (FeignException.NotFound e) {
             throw new NotFoundException(e.getMessage());
         } catch (FeignException.BadRequest e) {
             throw new BadRequestException(e.getMessage());
         }
+
+        log.info("Updated car: {}", updatedCar);
 
         return updatedCar;
     }
 
     @Override
     public CarResponseDTO updateCarStatusAsBusy(UUID carId) {
+
+        log.info("Trying to set car's status as busy for car with id: {}", carId);
+
         CarResponseDTO updatedCar;
 
         try {
-            log.info("Trying to set car's status as busy");
-
             updatedCar = carServiceFeignClient.updateCarStatusAsBusy(carId);
-
-            log.info("Updated car: {}", updatedCar);
-
         } catch (FeignException.NotFound e) {
             throw new NotFoundException(e.getMessage());
         } catch (FeignException.BadRequest e) {
             throw new BadRequestException(e.getMessage());
         }
+
+        log.info("Updated car: {}", updatedCar);
 
         return updatedCar;
     }
@@ -88,7 +86,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public CarResponseDTO findCarById(UUID carId) {
 
-        log.info("Trying to find car with id: {}", carId);
+        log.info("Trying to find car by id: {}", carId);
 
         CarResponseDTO car;
 
@@ -98,11 +96,16 @@ public class CarServiceImpl implements CarService {
             throw new NotFoundException(e.getMessage());
         }
 
+        log.info("Found car: {}", car);
+
         return car;
     }
 
     @Override
     public CarResponseDTO findRepairedAndFreeCarById(UUID carId) {
+
+        log.info("Trying to find repaired and free car by id: {}", carId);
+
         CarResponseDTO car = findCarById(carId);
 
         if (car.isBroken()) {
@@ -114,6 +117,8 @@ public class CarServiceImpl implements CarService {
             throw new BadRequestException(
                     String.format("The car with id = %s isn't free", carId));
         }
+
+        log.info("Found car: {}", car);
 
         return car;
     }

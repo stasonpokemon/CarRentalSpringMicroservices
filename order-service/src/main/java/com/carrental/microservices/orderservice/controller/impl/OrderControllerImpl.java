@@ -28,7 +28,7 @@ public class OrderControllerImpl implements OrderController {
 
         log.info("GET request to find all orders");
 
-        return orderService.findAll(pageable);
+        return orderService.findAllOrders(pageable);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class OrderControllerImpl implements OrderController {
 
         log.info("GET request to find orders by user id: {}", userId);
 
-        return orderService.findOrdersByUserId(userId, pageable);
+        return orderService.findAllOrdersByUserId(userId, pageable);
     }
 
     @Override
