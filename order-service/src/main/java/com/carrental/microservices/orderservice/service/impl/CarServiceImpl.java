@@ -4,6 +4,9 @@ import com.carrental.microservices.orderservice.domain.dto.response.CarResponseD
 import com.carrental.microservices.orderservice.exception.BadRequestException;
 import com.carrental.microservices.orderservice.exception.NotFoundException;
 import com.carrental.microservices.orderservice.feign.CarServiceFeignClient;
+import com.carrental.microservices.orderservice.kafka.messages.CarStatus;
+import com.carrental.microservices.orderservice.kafka.messages.CarStatusMessage;
+import com.carrental.microservices.orderservice.kafka.producer.CarStatusKafkaProducer;
 import com.carrental.microservices.orderservice.service.CarService;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -19,71 +22,49 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 public class CarServiceImpl implements CarService {
+
+    private final CarStatusKafkaProducer carStatusKafkaProducer;
 
     private final CarServiceFeignClient carServiceFeignClient;
 
     @Override
-    public CarResponseDTO updateCarStatusAsFree(UUID carId) {
+    public void updateCarStatusAsFree(UUID carId) {
 
         log.info("Trying to set car's status as free for car with id: {}", carId);
 
-        CarResponseDTO updatedCar;
-
-        try {
-            updatedCar = carServiceFeignClient.updateCarStatusAsFree(carId);
-        } catch (FeignException.NotFound e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (FeignException.BadRequest e) {
-            throw new BadRequestException(e.getMessage());
-        }
-
-        log.info("Updated car: {}", updatedCar);
-
-        return updatedCar;
+        carStatusKafkaProducer.sendMessage(
+                CarStatusMessage.builder()
+                        .carId(carId)
+                        .carStatus(CarStatus.FREE).build());
     }
 
     @Override
-    public CarResponseDTO updateCarStatusAsBroken(UUID carId, String damageDescription) {
-        CarResponseDTO updatedCar;
+    @Transactional
+    public void updateCarStatusAsBroken(UUID carId, String damageDescription) {
 
         log.info("Trying to set car's status as broken for car with id: {}", carId);
 
-        try {
-            updatedCar = carServiceFeignClient.setCarAsBroken(carId, damageDescription);
-        } catch (FeignException.NotFound e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (FeignException.BadRequest e) {
-            throw new BadRequestException(e.getMessage());
-        }
-
-        log.info("Updated car: {}", updatedCar);
-
-        return updatedCar;
+        carStatusKafkaProducer.sendMessage(
+                CarStatusMessage.builder()
+                        .carId(carId)
+                        .carStatus(CarStatus.BROKEN)
+                        .damageDescription(damageDescription).build());
     }
 
     @Override
-    public CarResponseDTO updateCarStatusAsBusy(UUID carId) {
+    public void updateCarStatusAsBusy(UUID carId) {
 
         log.info("Trying to set car's status as busy for car with id: {}", carId);
 
-        CarResponseDTO updatedCar;
-
-        try {
-            updatedCar = carServiceFeignClient.updateCarStatusAsBusy(carId);
-        } catch (FeignException.NotFound e) {
-            throw new NotFoundException(e.getMessage());
-        } catch (FeignException.BadRequest e) {
-            throw new BadRequestException(e.getMessage());
-        }
-
-        log.info("Updated car: {}", updatedCar);
-
-        return updatedCar;
+        carStatusKafkaProducer.sendMessage(
+                CarStatusMessage.builder()
+                        .carId(carId)
+                        .carStatus(CarStatus.BUSY).build());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CarResponseDTO findCarById(UUID carId) {
 
         log.info("Trying to find car by id: {}", carId);
@@ -102,6 +83,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CarResponseDTO findRepairedAndFreeCarById(UUID carId) {
 
         log.info("Trying to find repaired and free car by id: {}", carId);

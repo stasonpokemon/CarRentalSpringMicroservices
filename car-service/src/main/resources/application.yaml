@@ -21,6 +21,13 @@ spring:
     user: postgres
     password: postgres
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    order-car-status:
+      consumer:
+        topic: order.car.status
+        groupId: order-car-status-group
+
 eureka:
   client:
     serviceUrl:

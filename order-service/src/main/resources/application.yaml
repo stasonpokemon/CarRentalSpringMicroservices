@@ -27,6 +27,13 @@ spring:
         hc5:
           enabled: true
 
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    order-car-status:
+      producer:
+        topic: order.car.status
+
 eureka:
   client:
     serviceUrl:

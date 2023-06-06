@@ -1,10 +1,10 @@
 package com.carrental.microservices.carservice.controller.impl;
 
+import com.carrental.microservices.carservice.service.CarService;
 import com.carrental.microservices.carservice.controller.CarController;
 import com.carrental.microservices.carservice.domain.dto.request.CreateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.request.UpdateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.response.CarResponseDTO;
-import com.carrental.microservices.carservice.service.CarService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

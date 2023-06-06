@@ -9,11 +9,11 @@ import java.util.UUID;
  */
 public interface CarService {
 
-    CarResponseDTO updateCarStatusAsFree(UUID carId);
+    void updateCarStatusAsFree(UUID carId);
 
-    CarResponseDTO updateCarStatusAsBroken(UUID carId, String damageDescription);
+    void updateCarStatusAsBroken(UUID carId, String damageDescription);
 
-    CarResponseDTO updateCarStatusAsBusy(UUID carId);
+    void updateCarStatusAsBusy(UUID carId);
 
     CarResponseDTO findCarById(UUID carId);
 

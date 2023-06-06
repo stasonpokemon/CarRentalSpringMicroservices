@@ -86,7 +86,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    @Transactional(readOnly = true)
     public Order findOrderWithOrderStatusConfirmed(UUID orderId) {
         Order order = findOrderWithoutRefundById(orderId);
 
@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    @Transactional(readOnly = true)
     public Order findOrderWithOrderStatusUnderConsideration(UUID orderId) {
         Order order = findOrderWithoutRefundById(orderId);
 
@@ -174,7 +174,6 @@ public class OrderServiceImpl implements OrderService {
 
         order = orderService.saveNewOrderWithOrderStatusUnderConsideration(order, car, userId);
 
-        // todo С ПОМОЩЬЮ kafka
         carService.updateCarStatusAsBusy(order.getCarId());
 
         OrderResponseDTO orderResponseDTO = orderMapper.orderToOrderResponseDTO(order);
@@ -218,8 +217,6 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Successful setting order status as refusal");
 
-
-        // Обновление машины transactional todo С ПОМОЩЬЮ kafka
         carService.updateCarStatusAsFree(order.getCarId());
 
         log.info("Successful setting car status as free");
