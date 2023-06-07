@@ -1,16 +1,16 @@
 package com.carrental.microservices.carservice.service.impl;
 
 
+import com.carrental.microservices.carservice.exception.BadRequestException;
+import com.carrental.microservices.carservice.util.CarUtil;
 import com.carrental.microservices.carservice.domain.entity.Car;
 import com.carrental.microservices.carservice.domain.dto.request.CreateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.request.UpdateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.response.CarResponseDTO;
 import com.carrental.microservices.carservice.domain.mapper.CarMapper;
-import com.carrental.microservices.carservice.exception.BadRequestException;
 import com.carrental.microservices.carservice.exception.NotFoundException;
 import com.carrental.microservices.carservice.repo.CarRepository;
 import com.carrental.microservices.carservice.service.CarService;
-import com.carrental.microservices.carservice.util.CarUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;

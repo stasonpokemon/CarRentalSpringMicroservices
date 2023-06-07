@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -51,7 +50,7 @@ public class RefundServiceImpl implements RefundService {
 
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
     public Refund saveNewRefundWithoutDamage(Refund refund, Order order) {
         refund.setRefundDate(LocalDateTime.now());
         refund.setPrice(0);
@@ -64,7 +63,7 @@ public class RefundServiceImpl implements RefundService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    @Transactional
     public Refund saveNewRefundWithDamage(Refund refund, Order order) {
         refund.setRefundDate(LocalDateTime.now());
         refund.setOrder(order);
@@ -107,19 +106,19 @@ public class RefundServiceImpl implements RefundService {
 
         Refund refund = refundMapper.createRefundRequestDTOToRefund(createRefundRequestDTO);
 
+        UUID carId = order.getCarId();
+
         if (!createRefundRequestDTO.getDamage()) {
 
             refund = refundService.saveNewRefundWithoutDamage(refund, order);
 
-            // todo kafka
-            carService.updateCarStatusAsFree(refund.getOrder().getCarId());
+            carService.updateCarStatusAsFree(carId);
 
         } else {
 
             refund = refundService.saveNewRefundWithDamage(refund, order);
 
-            // todo kafka
-            carService.updateCarStatusAsBroken(refund.getOrder().getCarId(), refund.getDamageDescription());
+            carService.updateCarStatusAsBroken(carId, refund.getDamageDescription());
         }
 
         RefundResponseDTO refundResponseDTO = refundMapper.refundToRefundResponseDTO(refund);
