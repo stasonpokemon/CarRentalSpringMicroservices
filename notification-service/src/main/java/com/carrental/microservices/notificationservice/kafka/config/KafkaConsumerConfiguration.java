@@ -1,14 +1,14 @@
-package com.carrental.microservices.carservice.kafka.configuration;
+package com.carrental.microservices.notificationservice.kafka.config;
 
-import com.carrental.microservices.carservice.kafka.messages.OrderCarStatusKafkaMessage;
-import com.carrental.microservices.carservice.kafka.properties.KafkaOrderCarStatusConsumerProperties;
+import com.carrental.microservices.notificationservice.kafka.message.MailKafkaMessage;
+import com.carrental.microservices.notificationservice.kafka.properties.UserNotificationConsumerProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -23,37 +23,39 @@ import java.util.Map;
  * KafkaConsumerConfiguration configuration class.
  */
 @Configuration
-@EnableKafka
 @RequiredArgsConstructor
+@Slf4j
 public class KafkaConsumerConfiguration {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
-    private final KafkaOrderCarStatusConsumerProperties kafkaOrderCarStatusConsumerProperties;
+    private final UserNotificationConsumerProperties userNotificationConsumerProperties;
 
-    @Bean
+    @Bean(name = "userNotificationConsumerConfig")
     public Map<String, Object> consumerConfig() {
+        log.info("Bootstrap server: {}",bootstrapServers);
+        log.info("groupId: {}",userNotificationConsumerProperties.getGroupId());
         HashMap<String, Object> properties = new HashMap<>();
         properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaOrderCarStatusConsumerProperties.getGroupId());
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, userNotificationConsumerProperties.getGroupId());
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         properties.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
         return properties;
     }
 
-    @Bean
-    public ConsumerFactory<String, OrderCarStatusKafkaMessage> consumerFactory() {
+    @Bean(name = "userNotificationConsumerFactory")
+    public ConsumerFactory<String, MailKafkaMessage> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig(),
                 new StringDeserializer(),
-                new JsonDeserializer<>(OrderCarStatusKafkaMessage.class));
+                new JsonDeserializer<>(MailKafkaMessage.class));
     }
 
-    @Bean
+    @Bean(name = "userNotificationConsumerContainerFactory")
     public KafkaListenerContainerFactory<
-            ConcurrentMessageListenerContainer<String, OrderCarStatusKafkaMessage>> listenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, OrderCarStatusKafkaMessage> factory
+            ConcurrentMessageListenerContainer<String, MailKafkaMessage>> listenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, MailKafkaMessage> factory
                 = new ConcurrentKafkaListenerContainerFactory<>();
 
         factory.setConsumerFactory(consumerFactory());

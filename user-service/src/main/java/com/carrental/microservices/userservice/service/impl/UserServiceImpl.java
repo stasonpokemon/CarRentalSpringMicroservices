@@ -1,32 +1,30 @@
 package com.carrental.microservices.userservice.service.impl;
 
-import com.carrental.microservices.userservice.domain.entity.Passport;
-import com.carrental.microservices.userservice.domain.entity.Role;
-import com.carrental.microservices.userservice.domain.entity.User;
 import com.carrental.microservices.userservice.domain.dto.request.CreateUserRequestDTO;
 import com.carrental.microservices.userservice.domain.dto.request.PassportRequestDTO;
 import com.carrental.microservices.userservice.domain.dto.response.PassportResponseDTO;
 import com.carrental.microservices.userservice.domain.dto.response.UserResponseDTO;
+import com.carrental.microservices.userservice.domain.entity.Passport;
+import com.carrental.microservices.userservice.domain.entity.Role;
+import com.carrental.microservices.userservice.domain.entity.User;
 import com.carrental.microservices.userservice.domain.mapper.PassportMapper;
 import com.carrental.microservices.userservice.domain.mapper.UserMapper;
 import com.carrental.microservices.userservice.exception.BadRequestException;
 import com.carrental.microservices.userservice.exception.NotFoundException;
 import com.carrental.microservices.userservice.repo.PassportRepository;
 import com.carrental.microservices.userservice.repo.UserRepository;
-import com.carrental.microservices.userservice.service.MailSenderService;
+import com.carrental.microservices.userservice.service.MailService;
 import com.carrental.microservices.userservice.service.UserService;
 import com.carrental.microservices.userservice.util.PassportUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
@@ -38,23 +36,20 @@ import java.util.stream.Collectors;
  * Implementation class for UserService.
  */
 @Service
-@Transactional
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
-    @Value("${server.port}")
-    private String serverPort;
 
     private final UserRepository userRepository;
 
     private final PassportRepository passportRepository;
 
-    private final MailSenderService mailSenderService;
+    private final MailService mailService;
 
     private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     private final PassportMapper passportMapper = Mappers.getMapper(PassportMapper.class);
+
 
     @Override
     @Transactional(readOnly = true)
@@ -70,7 +65,6 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public ResponseEntity<Page<UserResponseDTO>> findAll(Pageable pageable) {
@@ -82,16 +76,9 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::userToUserResponseDTO)
                 .collect(Collectors.toList()));
 
-
-        if (userResponseDTOPage.isEmpty()) {
-            throw new NotFoundException(User.class);
-        }
-
-        ResponseEntity<Page<UserResponseDTO>> response = new ResponseEntity<>(userResponseDTOPage, HttpStatus.OK);
-
         log.info("Find all users: {}", userResponseDTOPage.getContent());
 
-        return response;
+        return new ResponseEntity<>(userResponseDTOPage, HttpStatus.OK);
     }
 
 
@@ -107,16 +94,14 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException(String.format("Passport not found for user with id = %s", userId));
         }
 
-        ResponseEntity<PassportResponseDTO> response =
-                new ResponseEntity<>(passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
-
         log.info("Find passport: {} by userId: {}", passport, userId);
 
-        return response;
+        return new ResponseEntity<>(passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
     }
 
 
     @Override
+    @Transactional
     public ResponseEntity<PassportResponseDTO> createPassportForUser(UUID userId,
                                                                      PassportRequestDTO passportRequestDTO) {
 
@@ -132,15 +117,14 @@ public class UserServiceImpl implements UserService {
         passport.setUser(user);
         passport = passportRepository.save(passport);
 
-        ResponseEntity<PassportResponseDTO> response = new ResponseEntity<>(
-                passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
-
         log.info("Creat new passport: {} for user with id: {}", passport, userId);
 
-        return response;
+        return new ResponseEntity<>(
+                passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
     }
 
     @Override
+    @Transactional
     public ResponseEntity<PassportResponseDTO> updateUsersPassport(UUID userId,
                                                                    PassportRequestDTO passportRequestDTO) {
 
@@ -148,76 +132,71 @@ public class UserServiceImpl implements UserService {
 
         Passport passport = findPassportByUserOrThrowException(findUserByIdOrThrowException(userId));
         PassportUtil.getInstance().copyNotNullFieldsFromPassportDTOToPassport(passportRequestDTO, passport);
-        ResponseEntity<PassportResponseDTO> response =
-                new ResponseEntity<>(passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
 
         log.info("Update user's passport: {} by userId: {}", passport, userId);
 
-        return response;
+        return new ResponseEntity<>(passportMapper.passportToPassportResponseDTO(passport), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<UserResponseDTO> saveRegisteredUser(CreateUserRequestDTO createUserRequestDTO) {
+    public ResponseEntity<UserResponseDTO> registrationNewUser(CreateUserRequestDTO createUserRequestDTO) {
 
-        log.info("Saving registered user: {}", createUserRequestDTO);
+        log.info("trying to register a new user: {}", createUserRequestDTO);
 
         if (userRepository.findUserByUsername(createUserRequestDTO.getUsername()).isPresent()) {
 
-            log.warn("There is user with username: {}", createUserRequestDTO.getUsername());
+            log.info("There is user with username: {}", createUserRequestDTO.getUsername());
 
             throw new BadRequestException("There is user with the same username");
         }
 
         if (userRepository.findUserByEmail(createUserRequestDTO.getEmail()).isPresent()) {
 
-            log.warn("There is user with email: {}", createUserRequestDTO.getEmail());
+            log.info("There is user with email: {}", createUserRequestDTO.getEmail());
 
             throw new BadRequestException("There is user with the same email");
         }
 
+        User user = createUser(createUserRequestDTO);
+
+        log.info("Save registered user: {}", user);
+
+        mailService.sendActivationCode(user);
+
+        log.info("Sent message with activation code");
+
+        return new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public User createUser(CreateUserRequestDTO createUserRequestDTO) {
         User user = userMapper.createUserRequestDTOToUser(createUserRequestDTO);
         user.setActive(false);
         user.setActivationCode(UUID.randomUUID().toString());
         user.setRoles(Collections.singleton(Role.USER));
-
-        ResponseEntity<UserResponseDTO> response =
-                new ResponseEntity<>(userMapper.userToUserResponseDTO(userRepository.save(user)), HttpStatus.OK);
-
-        log.info("Save registered user: {}", user);
-
-        // Send activation code to user email
-        String message = String.format("Hello, %s! \n Welcome to car rental website. Please, visit next link " +
-                        "for activate your profile: http://localhost:%s/registration/activate/%s!",
-                user.getUsername(),
-                serverPort,
-                user.getActivationCode()
-        );
-
-        mailSenderService.send(user.getEmail(), "Activation code", message);
-
-        return response;
+        return userRepository.save(user);
     }
 
     @Override
+    @Transactional
     public ResponseEntity<UserResponseDTO> activateUser(String activateCode) {
 
-        log.info("Activating user");
+        log.info("Trying to activate user");
 
         User user = userRepository.findUserByActivationCode(activateCode)
                 .orElseThrow(() -> new NotFoundException("Activation code is note found"));
         user.setActivationCode(null);
         user.setActive(true);
 
-        ResponseEntity<UserResponseDTO> response =
-                new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
-
         log.info("Activate user: {}", user);
 
-        return response;
+        return new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
     }
 
 
     @Override
+    @Transactional
     public ResponseEntity<UserResponseDTO> blockUser(UUID id) {
 
         log.info("Blocking user with id: {}", id);
@@ -229,15 +208,14 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setActive(false);
-        ResponseEntity<UserResponseDTO> response =
-                new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
 
         log.info("Block user: {}", user);
 
-        return response;
+        return new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
     }
 
     @Override
+    @Transactional
     public ResponseEntity<UserResponseDTO> unlockUser(UUID id) {
 
         log.info("Unlocking user with id: {}", id);
@@ -250,15 +228,13 @@ public class UserServiceImpl implements UserService {
 
         user.setActive(true);
 
-        ResponseEntity<UserResponseDTO> response =
-                new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
-
         log.info("Unlock user: {}", user);
 
-        return response;
+
+        return new ResponseEntity<>(userMapper.userToUserResponseDTO(user), HttpStatus.OK);
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    @Transactional(readOnly = true)
     @Override
     public User findUserByIdOrThrowException(UUID userId) {
 
@@ -272,7 +248,8 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    private Passport findPassportByUserOrThrowException(User user) {
+    @Transactional(readOnly = true)
+    public Passport findPassportByUserOrThrowException(User user) {
 
         log.info("Finding passport by user: {}", user);
 

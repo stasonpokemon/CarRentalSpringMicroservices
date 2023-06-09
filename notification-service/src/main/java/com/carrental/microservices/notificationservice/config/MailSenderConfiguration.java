@@ -1,4 +1,4 @@
-package com.carrental.microservices.userservice.config;
+package com.carrental.microservices.notificationservice.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -32,6 +32,11 @@
                   <project path="$PROJECT_DIR$/api-gateway" />
                 </projects>
               </build>
+              <build path="$PROJECT_DIR$/notification-service" name="notification-service">
+                <projects>
+                  <project path="$PROJECT_DIR$/notification-service" />
+                </projects>
+              </build>
             </builds>
           </compositeBuild>
         </compositeConfiguration>
@@ -44,6 +49,7 @@
             <option value="$PROJECT_DIR$/api-gateway" />
             <option value="$PROJECT_DIR$/car-service" />
             <option value="$PROJECT_DIR$/eureka-server" />
+            <option value="$PROJECT_DIR$/notification-service" />
             <option value="$PROJECT_DIR$/order-service" />
             <option value="$PROJECT_DIR$/user-service" />
           </set>
@@ -76,6 +82,16 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/eureka-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/notification-service" />
+        <option name="gradleHome" value="/usr/local/Cellar/gradle/8.0.2/libexec" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/notification-service" />
           </set>
         </option>
       </GradleProjectSettings>

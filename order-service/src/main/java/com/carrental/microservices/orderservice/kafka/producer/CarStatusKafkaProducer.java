@@ -1,7 +1,7 @@
 package com.carrental.microservices.orderservice.kafka.producer;
 
 import com.carrental.microservices.orderservice.kafka.messages.CarStatusMessage;
-import com.carrental.microservices.orderservice.kafka.properties.KafkaOrderCarStatusProducerProperties;
+import com.carrental.microservices.orderservice.kafka.properties.OrderCarStatusKafkaProducerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -17,11 +17,11 @@ public class CarStatusKafkaProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    private final KafkaOrderCarStatusProducerProperties kafkaOrderCarStatusProducerProperties;
+    private final OrderCarStatusKafkaProducerProperties orderCarStatusKafkaProducerProperties;
 
     public void sendMessage(CarStatusMessage carStatusMessage) {
 
-        String topicName = kafkaOrderCarStatusProducerProperties.getTopic();
+        String topicName = orderCarStatusKafkaProducerProperties.getTopic();
 
         log.info("Trying to send message: {} to topic: {}", carStatusMessage, topicName);
 

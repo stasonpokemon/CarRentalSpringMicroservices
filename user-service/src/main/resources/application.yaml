@@ -21,15 +21,11 @@ spring:
     user: postgres
     password: postgres
 
-  mail:
-    host: smtp.yandex.ru
-    username: nestydem@yandex.ru
-    password: huorjdcocbsfvzoc
-    port: 456
-    protocol: smtps
-
-mail:
-  debug: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    user-notification:
+      producer:
+        topic: user-notification
 
 eureka:
   client:

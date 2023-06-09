@@ -1,6 +1,6 @@
-package com.carrental.microservices.orderservice.kafka.config;
+package com.carrental.microservices.userservice.kafka.config;
 
-import com.carrental.microservices.orderservice.kafka.properties.OrderCarStatusKafkaProducerProperties;
+import com.carrental.microservices.userservice.kafka.properties.UserNotificationProducerProperties;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +14,10 @@ import org.springframework.kafka.config.TopicBuilder;
 @RequiredArgsConstructor
 public class KafkaTopicConfiguration {
 
-    private final OrderCarStatusKafkaProducerProperties orderCarStatusKafkaProducerProperties;
+    private final UserNotificationProducerProperties userNotificationProducerProperties;
 
     @Bean
-    public NewTopic orderCarStatusTopic(){
-        return TopicBuilder.name(orderCarStatusKafkaProducerProperties.getTopic()).build();
+    public NewTopic userNotificationTopic() {
+        return TopicBuilder.name(userNotificationProducerProperties.getTopic()).build();
     }
 }

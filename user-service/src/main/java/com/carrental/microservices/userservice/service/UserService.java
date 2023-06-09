@@ -8,6 +8,7 @@ import com.carrental.microservices.userservice.domain.dto.response.UserResponseD
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -30,7 +31,10 @@ public interface UserService {
     ResponseEntity<PassportResponseDTO> updateUsersPassport(UUID userId,
                                           PassportRequestDTO passportRequestDTO);
 
-    ResponseEntity<UserResponseDTO> saveRegisteredUser(CreateUserRequestDTO createUserRequestDTO);
+    ResponseEntity<UserResponseDTO> registrationNewUser(CreateUserRequestDTO createUserRequestDTO);
+
+    @Transactional
+    User createUser(CreateUserRequestDTO createUserRequestDTO);
 
     ResponseEntity<UserResponseDTO> activateUser(String activateCode);
 

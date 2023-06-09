@@ -5,4 +5,5 @@ includeBuild 'car-service'
 includeBuild 'user-service'
 includeBuild 'order-service'
 includeBuild 'api-gateway'
+includeBuild 'notification-service'
 
