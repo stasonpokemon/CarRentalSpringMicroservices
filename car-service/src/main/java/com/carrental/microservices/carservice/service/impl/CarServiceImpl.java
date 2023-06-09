@@ -1,16 +1,16 @@
 package com.carrental.microservices.carservice.service.impl;
 
 
-import com.carrental.microservices.carservice.exception.BadRequestException;
-import com.carrental.microservices.carservice.util.CarUtil;
-import com.carrental.microservices.carservice.domain.entity.Car;
 import com.carrental.microservices.carservice.domain.dto.request.CreateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.request.UpdateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.response.CarResponseDTO;
+import com.carrental.microservices.carservice.domain.entity.Car;
 import com.carrental.microservices.carservice.domain.mapper.CarMapper;
+import com.carrental.microservices.carservice.exception.BadRequestException;
 import com.carrental.microservices.carservice.exception.NotFoundException;
 import com.carrental.microservices.carservice.repo.CarRepository;
 import com.carrental.microservices.carservice.service.CarService;
+import com.carrental.microservices.carservice.util.CarUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -20,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -55,11 +54,9 @@ public class CarServiceImpl implements CarService {
                     .orElseThrow(() -> new NotFoundException(Car.class, id)));
         }
 
-        ResponseEntity<CarResponseDTO> response = new ResponseEntity<>(carResponseDTO, HttpStatus.OK);
-
         log.info("Find car: {}", carResponseDTO);
 
-        return response;
+        return new ResponseEntity<>(carResponseDTO, HttpStatus.OK);
     }
 
     @Override
@@ -82,11 +79,9 @@ public class CarServiceImpl implements CarService {
                 .map(carMapper::carToCarResponseDTO)
                 .collect(Collectors.toList()));
 
-        ResponseEntity<Page<CarResponseDTO>> response = new ResponseEntity<>(carResponseDTOPage, HttpStatus.OK);
-
         log.info("Find all cars: {}", carResponseDTOPage.getContent());
 
-        return response;
+        return new ResponseEntity<>(carResponseDTOPage, HttpStatus.OK);
     }
 
     @Override
@@ -101,15 +96,9 @@ public class CarServiceImpl implements CarService {
                         .map(carMapper::carToCarResponseDTO)
                         .collect(Collectors.toList()));
 
-        if (carResponseDTOPage.isEmpty()) {
-            throw new NotFoundException("There isn't free cars not mark as deleted");
-        }
-
-        ResponseEntity<Page<CarResponseDTO>> response = new ResponseEntity<>(carResponseDTOPage, HttpStatus.OK);
-
         log.info("Find all free not mark as deleted cars: {}", carResponseDTOPage.getContent());
 
-        return response;
+        return new ResponseEntity<>(carResponseDTOPage, HttpStatus.OK);
     }
 
     @Override
@@ -123,12 +112,9 @@ public class CarServiceImpl implements CarService {
         car.setDeleted(false);
         Car savedCar = carRepository.save(car);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(savedCar), HttpStatus.OK);
-
         log.info("Save car: {}", car);
 
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(savedCar), HttpStatus.OK);
     }
 
     @Override
@@ -140,12 +126,9 @@ public class CarServiceImpl implements CarService {
         Car car = findCarByIdOrThrowException(id);
         CarUtil.getInstance().copyNotNullFieldsFromUpdateCarDTOToCar(updateCarRequestDTO, car);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
+        log.info("Update car: {}", car);
 
-        log.info("Update car: {} with id: {}", car, id);
-
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
     @Override
@@ -167,12 +150,9 @@ public class CarServiceImpl implements CarService {
         car.setDamageStatus("Without damage");
         car.setBusy(false);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
+        log.info("Fix broken car: {}", car);
 
-        log.info("Fix broken car: {} with id: {}", car, carId);
-
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
 
     }
 
@@ -196,11 +176,9 @@ public class CarServiceImpl implements CarService {
         car.setBusy(true);
         car.setDamageStatus(damageStatus);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
+        log.info("Set the car: {} as broken", car);
 
-        log.info("Set the car: {} as broken with id: {}", car, carId);
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
     @Override
@@ -223,12 +201,9 @@ public class CarServiceImpl implements CarService {
 
         car.setBusy(true);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
-
         log.info("Set the car: {} as busy", car);
 
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
     @Override
@@ -250,12 +225,9 @@ public class CarServiceImpl implements CarService {
 
         car.setBusy(false);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
-
         log.info("Set the car: {} as free", car);
 
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
 
@@ -273,16 +245,13 @@ public class CarServiceImpl implements CarService {
         car.setDeleted(true);
         car.setBusy(true);
 
-        ResponseEntity<CarResponseDTO> response =
-                new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
+        log.info("Mark car: {} as deleted", car);
 
-        log.info("Mark car: {} with id: {} as deleted", car, id);
-
-        return response;
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
 
-    @Transactional(readOnly = true, propagation = Propagation.MANDATORY)
+    @Transactional(readOnly = true)
     @Override
     public Car findCarByIdOrThrowException(UUID id) {
 
@@ -295,6 +264,4 @@ public class CarServiceImpl implements CarService {
 
         return car;
     }
-
-
 }

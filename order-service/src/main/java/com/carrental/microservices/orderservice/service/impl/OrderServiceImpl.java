@@ -158,7 +158,6 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Creating new order: {}", createOrderRequestDTO);
 
-
         UUID carId = Extractor.extractUUIDFromString(createOrderRequestDTO.getCarId());
         UUID userId = Extractor.extractUUIDFromString(createOrderRequestDTO.getUserId());
 
@@ -176,14 +175,9 @@ public class OrderServiceImpl implements OrderService {
 
         carService.updateCarStatusAsBusy(order.getCarId());
 
-        OrderResponseDTO orderResponseDTO = orderMapper.orderToOrderResponseDTO(order);
-
-        ResponseEntity<OrderResponseDTO> response =
-                new ResponseEntity<>(orderResponseDTO, HttpStatus.OK);
-
         log.info("Creat new order: {}", order);
 
-        return response;
+        return new ResponseEntity<>(orderMapper.orderToOrderResponseDTO(order), HttpStatus.OK);
     }
 
 
@@ -197,12 +191,9 @@ public class OrderServiceImpl implements OrderService {
 
         order.setOrderStatus(OrderStatus.CONFIRMED);
 
-        ResponseEntity<OrderResponseDTO> response =
-                new ResponseEntity<>(orderMapper.orderToOrderResponseDTO(order), HttpStatus.OK);
-
         log.info("Accept order with id: {}", orderId);
 
-        return response;
+        return new ResponseEntity<>(orderMapper.orderToOrderResponseDTO(order), HttpStatus.OK);
     }
 
     @Override
@@ -224,12 +215,9 @@ public class OrderServiceImpl implements OrderService {
 
         // todo сделать алерт менеджеру при рассинхроне
 
-        ResponseEntity<OrderResponseDTO> response =
-                new ResponseEntity<>(orderMapper.orderToOrderResponseDTO(order), HttpStatus.OK);
-
         log.info("Cancel order with id: {}", orderId);
 
-        return response;
+        return new ResponseEntity<>(orderMapper.orderToOrderResponseDTO(order), HttpStatus.OK);
     }
 
     @Override
