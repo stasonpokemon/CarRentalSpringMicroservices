@@ -24,7 +24,7 @@ public class RegistrationControllerImpl implements RegistrationController {
 
         log.info("POST request to save registered user: {}", createUserRequestDTO);
 
-        return userService.saveRegisteredUser(createUserRequestDTO);
+        return userService.registrationNewUser(createUserRequestDTO);
     }
 
     @Override

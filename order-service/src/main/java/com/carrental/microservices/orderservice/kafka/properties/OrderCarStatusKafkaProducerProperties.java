@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "spring.kafka.order-car-status.producer")
-public class KafkaOrderCarStatusProducerProperties {
+public class OrderCarStatusKafkaProducerProperties {
 
     private String topic;
 }

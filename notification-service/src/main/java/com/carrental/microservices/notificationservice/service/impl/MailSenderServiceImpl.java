@@ -1,7 +1,6 @@
-package com.carrental.microservices.userservice.service.impl;
+package com.carrental.microservices.notificationservice.service.impl;
 
-import com.carrental.microservices.userservice.service.MailSenderService;
-import com.carrental.microservices.userservice.util.tread.MailSenderThread;
+import com.carrental.microservices.notificationservice.service.MailSenderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +33,8 @@ public class MailSenderServiceImpl implements MailSenderService {
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
 
-        new MailSenderThread(mailSender, mailMessage).start();
-    }
+        mailSender.send(mailMessage);
+
+        log.info("Sent email to: {} with subject: {} with message: {}",
+                emailTo, subject, message);    }
 }

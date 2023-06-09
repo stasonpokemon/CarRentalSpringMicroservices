@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * CarStatusKafkaConsumer class that listens for messages from the producer.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +27,8 @@ public class CarStatusKafkaConsumer {
             groupId = "${spring.kafka.order-car-status.consumer.groupId}",
             containerFactory = "listenerContainerFactory")
     void listener(OrderCarStatusKafkaMessage message) {
+        log.info("Listen message: {} from topic: {}", message,
+                kafkaOrderCarStatusConsumerProperties.getTopic());
 
         if (message.getCarStatus().equals(CarStatus.BUSY)){
             carService.setCarAsBusy(message.getCarId());
@@ -32,8 +37,5 @@ public class CarStatusKafkaConsumer {
         } else if (message.getCarStatus().equals(CarStatus.BROKEN)){
             carService.setCarAsBroken(message.getCarId(), message.getDamageDescription());
         }
-
-        log.info("Listen message: {} from topic: {}", message,
-                kafkaOrderCarStatusConsumerProperties.getTopic());
     }
 }

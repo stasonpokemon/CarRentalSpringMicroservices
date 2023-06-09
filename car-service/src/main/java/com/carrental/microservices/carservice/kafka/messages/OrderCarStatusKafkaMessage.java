@@ -9,6 +9,9 @@ import lombok.extern.jackson.Jacksonized;
 import java.io.Serializable;
 import java.util.UUID;
 
+/**
+ * OrderCarStatusKafkaMessage kafka message class.
+ */
 @Data
 @Builder
 @Jacksonized
