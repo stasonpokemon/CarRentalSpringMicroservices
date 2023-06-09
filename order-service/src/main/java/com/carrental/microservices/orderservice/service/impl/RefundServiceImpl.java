@@ -88,11 +88,9 @@ public class RefundServiceImpl implements RefundService {
 
         RefundResponseDTO refundResponseDTO = refundMapper.refundToRefundResponseDTO(order.getRefund());
 
-        ResponseEntity<RefundResponseDTO> response = new ResponseEntity<>(refundResponseDTO, HttpStatus.OK);
-
         log.info("Fond order's refund: {}", refundResponseDTO);
 
-        return response;
+        return new ResponseEntity<>(refundResponseDTO, HttpStatus.OK);
     }
 
     @Override
@@ -123,12 +121,9 @@ public class RefundServiceImpl implements RefundService {
 
         RefundResponseDTO refundResponseDTO = refundMapper.refundToRefundResponseDTO(refund);
 
-        ResponseEntity<RefundResponseDTO> response =
-                new ResponseEntity<>(refundResponseDTO, HttpStatus.OK);
-
         log.info("Create refund: {}", refundResponseDTO);
 
-        return response;
+        return new ResponseEntity<>(refundResponseDTO, HttpStatus.OK);
     }
 
 }

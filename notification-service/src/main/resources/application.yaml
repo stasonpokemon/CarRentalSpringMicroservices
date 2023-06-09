@@ -1,0 +1,29 @@
+server:
+  port: 0
+
+
+spring:
+  application:
+    name: notification-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    user-notification:
+      consumer:
+        topic: user-notification
+        groupId: user-notification-group
+
+  mail:
+    host: smtp.yandex.ru
+    username: nestydem@yandex.ru
+    password: huorjdcocbsfvzoc
+    port: 456
+    protocol: smtps
+
+mail:
+  debug: true
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
