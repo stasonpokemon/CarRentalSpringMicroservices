@@ -84,18 +84,18 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = true)
-    public CarResponseDTO findRepairedAndFreeCarById(UUID carId) {
+    public CarResponseDTO findFreeCarById(UUID carId) {
 
         log.info("Trying to find repaired and free car by id: {}", carId);
 
         CarResponseDTO car = findCarById(carId);
 
-        if (car.isBroken()) {
+        if (car.getCarStatus().equals(CarStatus.BROKEN)) {
             throw new BadRequestException(
                     String.format("The car with id = %s is broken", carId));
         }
 
-        if (car.isBusy()) {
+        if (car.getCarStatus().equals(CarStatus.BUSY)) {
             throw new BadRequestException(
                     String.format("The car with id = %s isn't free", carId));
         }

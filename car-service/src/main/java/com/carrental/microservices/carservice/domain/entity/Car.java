@@ -37,18 +37,12 @@ public class Car extends BaseEntity {
     @Column(name = "price_per_day")
     private Double pricePerDay;
 
-    @Column(name = "is_busy")
-    private boolean busy;
+    @Column(name = "car_status")
+    private CarStatus carStatus;
 
     @Column(name = "damage_status")
     private String damageStatus;
 
     @Column(name = "img_link")
     private String imageLink;
-
-    @Column(name = "is_deleted")
-    private boolean deleted;
-
-    @Column(name = "is_broken")
-    private boolean broken;
 }

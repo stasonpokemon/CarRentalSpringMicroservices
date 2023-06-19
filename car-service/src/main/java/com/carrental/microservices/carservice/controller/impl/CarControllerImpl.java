@@ -26,15 +26,23 @@ public class CarControllerImpl implements CarController {
     private final CarService carService;
 
     @Override
-    public ResponseEntity<Page<CarResponseDTO>> findAll(Pageable pageable, Boolean withMarkedAsDeleted) {
+    public ResponseEntity<Page<CarResponseDTO>> findAllCars(Pageable pageable, Boolean withMarkedAsDeleted) {
 
         log.info("GET request to find all cars, and withMarkedAsDeleted status: {}", withMarkedAsDeleted);
 
-        return carService.findAll(pageable, withMarkedAsDeleted);
+        return carService.findAllCars(pageable, withMarkedAsDeleted);
     }
 
     @Override
-    public ResponseEntity<CarResponseDTO> findCar(UUID carId, Boolean withMarkedAsDeleted) {
+    public ResponseEntity<Page<CarResponseDTO>> findAllFreeCars(Pageable pageable) {
+
+        log.info("GET request to find all free cars");
+
+        return carService.findAllFreeCars(pageable);
+    }
+
+    @Override
+    public ResponseEntity<CarResponseDTO> findCarById(UUID carId, Boolean withMarkedAsDeleted) {
 
         log.info("GET request to find cars with id: {}, and withMarkedAsDeleted status: {}", carId, withMarkedAsDeleted);
 
@@ -46,7 +54,7 @@ public class CarControllerImpl implements CarController {
 
         log.info("POST request to create car: {}", createCarRequestDTO);
 
-        return carService.save(createCarRequestDTO);
+        return carService.createNewCar(createCarRequestDTO);
     }
 
     @Override
@@ -55,7 +63,7 @@ public class CarControllerImpl implements CarController {
 
         log.info("PATCH request to update car: {} with id: {}", updateCarRequestDTO, carId);
 
-        return carService.update(carId, updateCarRequestDTO);
+        return carService.updateCar(carId, updateCarRequestDTO);
     }
 
     @Override

@@ -45,18 +45,37 @@ public interface CarController {
                     description = "Found the following cars",
                     content = {@Content(mediaType = "application/json",
                             array = @ArraySchema(schema = @Schema(implementation = CarResponseDTO.class)))}),
-            @ApiResponse(responseCode = "404",
-                    description = "Not found",
+            @ApiResponse(responseCode = "400",
+                    description = "Bad request",
                     content = {@Content(schema = @Schema())}),
             @ApiResponse(responseCode = "500",
                     description = "Internal server error",
                     content = {@Content(schema = @Schema())})
     })
     @GetMapping()
-    ResponseEntity<Page<CarResponseDTO>> findAll(
+    ResponseEntity<Page<CarResponseDTO>> findAllCars(
             @ParameterObject @PageableDefault Pageable pageable,
             @RequestParam(name = "with_deleted", required = false, defaultValue = "false")
             Boolean withMarkedAsDeleted);
+
+    @Operation(
+            summary = "Find all free cars",
+            description = "This endpoint allows you to get all free cars from database")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Found the following cars",
+                    content = {@Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = CarResponseDTO.class)))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad request",
+                    content = {@Content(schema = @Schema())}),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = {@Content(schema = @Schema())})
+    })
+    @GetMapping("/free")
+    ResponseEntity<Page<CarResponseDTO>> findAllFreeCars(
+            @ParameterObject @PageableDefault Pageable pageable);
 
     @Operation(
             summary = "Find car by id",
@@ -84,7 +103,7 @@ public interface CarController {
                     content = {@Content(schema = @Schema())})
     })
     @GetMapping("/{id}")
-    ResponseEntity<CarResponseDTO> findCar(
+    ResponseEntity<CarResponseDTO> findCarById(
             @Parameter(description = "car id", required = true) @PathVariable(name = "id") UUID carId,
             @RequestParam(name = "with_deleted", required = false, defaultValue = "false")
             Boolean withMarkedAsDeleted);
@@ -172,14 +191,50 @@ public interface CarController {
                     description = "Internal server error",
                     content = {@Content(schema = @Schema())})
     })
-    @PatchMapping("/{id}/broken")
+    @PatchMapping("/{id}/broke")
     ResponseEntity<CarResponseDTO> setCarAsBroken(
             @PathVariable("id") UUID carId,
             @RequestParam(name = "damage") String damageStatus);
 
+    @Operation(
+            summary = "Set the car status as busy",
+            description = "This endpoint allows you to set the car status as busy")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Car status is set as busy",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CarResponseDTO.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad request",
+                    content = {@Content(schema = @Schema())}),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found",
+                    content = {@Content(schema = @Schema())}),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = {@Content(schema = @Schema())})
+    })
     @PatchMapping("/{id}/busy")
     ResponseEntity<CarResponseDTO> setCarAsBusy(@PathVariable("id") UUID carId);
 
+    @Operation(
+            summary = "Set the car status as free",
+            description = "This endpoint allows you to set the car status as free")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    description = "Car status is set as free",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CarResponseDTO.class))}),
+            @ApiResponse(responseCode = "400",
+                    description = "Bad request",
+                    content = {@Content(schema = @Schema())}),
+            @ApiResponse(responseCode = "404",
+                    description = "Not found",
+                    content = {@Content(schema = @Schema())}),
+            @ApiResponse(responseCode = "500",
+                    description = "Internal server error",
+                    content = {@Content(schema = @Schema())})
+    })
     @PatchMapping("/{id}/free")
     ResponseEntity<CarResponseDTO> setCarAsFree(@PathVariable("id") UUID carId);
 

@@ -9,6 +9,7 @@ import jakarta.persistence.Converter;
  */
 @Converter(autoApply = true)
 public class OrderStatusConverter implements AttributeConverter<OrderStatus, Integer> {
+
     @Override
     public Integer convertToDatabaseColumn(OrderStatus orderStatus) {
         return orderStatus == null ? -1 : orderStatus.getNumber();

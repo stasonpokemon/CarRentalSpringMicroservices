@@ -41,7 +41,9 @@ public class CarUtil {
         if (from.getDamageStatus() != null && !from.getDamageStatus().isEmpty()) {
             to.setDamageStatus(from.getDamageStatus());
         }
-        to.setBusy(from.isBusy());
+        if (from.getCarStatus() != null){
+            to.setCarStatus(from.getCarStatus());
+        }
     }
 
 }

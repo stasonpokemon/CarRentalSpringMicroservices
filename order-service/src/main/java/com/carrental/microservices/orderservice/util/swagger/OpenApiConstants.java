@@ -29,9 +29,9 @@ public class OpenApiConstants {
 
     public static final String CAR_PRICE_PER_DAY_DESCRIPTION = "Car's pricer per day";
 
-    public static final String CAR_EMPLOYMENT_STATUS = "false";
+    public static final String CAR_STATUS = "FREE";
 
-    public static final String CAR_EMPLOYMENT_STATUS_DESCRIPTION = "Car's employment status";
+    public static final String CAR_STATUS_DESCRIPTION = "Car's employment status";
 
     public static final String CAR_DAMAGE_STATUS = "Without damage";
 
