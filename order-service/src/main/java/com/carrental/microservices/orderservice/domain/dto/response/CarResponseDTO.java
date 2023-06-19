@@ -1,5 +1,6 @@
 package com.carrental.microservices.orderservice.domain.dto.response;
 
+import com.carrental.microservices.orderservice.kafka.messages.CarStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -10,12 +11,10 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.UUID;
 
-import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_BROKEN;
-import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_BROKEN_DESCRIPTION;
 import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_DAMAGE_STATUS;
 import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_DAMAGE_STATUS_DESCRIPTION;
-import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_EMPLOYMENT_STATUS;
-import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_EMPLOYMENT_STATUS_DESCRIPTION;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_STATUS;
+import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_STATUS_DESCRIPTION;
 import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_IMAGE_LINK;
 import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_IMAGE_LINK_DESCRIPTION;
 import static com.carrental.microservices.orderservice.util.swagger.OpenApiConstants.CAR_MODEL;
@@ -59,9 +58,9 @@ public class CarResponseDTO {
     @JsonProperty(value = "price_per_day")
     private Double pricePerDay;
 
-    @Schema(example = CAR_EMPLOYMENT_STATUS, description = CAR_EMPLOYMENT_STATUS_DESCRIPTION)
-    @JsonProperty(value = "is_busy")
-    private boolean busy;
+    @Schema(example = CAR_STATUS, description = CAR_STATUS_DESCRIPTION)
+    @JsonProperty(value = "car_status")
+    private CarStatus carStatus;
 
     @Schema(example = CAR_DAMAGE_STATUS, description = CAR_DAMAGE_STATUS_DESCRIPTION)
     @JsonProperty(value = "damage_status")
@@ -70,8 +69,4 @@ public class CarResponseDTO {
     @Schema(example = CAR_IMAGE_LINK, description = CAR_IMAGE_LINK_DESCRIPTION)
     @JsonProperty(value = "image_link")
     private String imageLink;
-
-    @Schema(example = CAR_BROKEN, description = CAR_BROKEN_DESCRIPTION)
-    @JsonProperty(value = "is_broken")
-    private boolean broken;
 }

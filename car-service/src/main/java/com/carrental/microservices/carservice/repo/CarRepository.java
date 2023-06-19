@@ -1,12 +1,12 @@
 package com.carrental.microservices.carservice.repo;
 
 import com.carrental.microservices.carservice.domain.entity.Car;
+import com.carrental.microservices.carservice.domain.entity.CarStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,10 +16,9 @@ import java.util.UUID;
 @Repository
 public interface CarRepository extends JpaRepository<Car, UUID> {
 
-    Page<Car> findAllByDeleted(boolean isDeleted, Pageable pageable);
+    Page<Car> findAllByCarStatusIsNot(CarStatus carStatus, Pageable pageable);
 
-    List<Car> findAllByBusyAndDeleted(boolean isBusy, boolean isDeleted, Pageable pageable);
+    Page<Car> findAllByCarStatus(CarStatus carStatus, Pageable pageable);
 
-    Optional<Car> findByIdAndDeleted(UUID id, boolean isDeleted);
-
+    Optional<Car> findByIdAndCarStatusIsNot(UUID id, CarStatus carStatus);
 }

@@ -19,14 +19,14 @@ public interface CarService {
 
     ResponseEntity<CarResponseDTO> findById(UUID carId, Boolean withMarkedAsDeleted);
 
-    ResponseEntity<Page<CarResponseDTO>> findAll(Pageable pageable, Boolean withMarkedAsDeleted);
+    ResponseEntity<Page<CarResponseDTO>> findAllCars(Pageable pageable, Boolean withMarkedAsDeleted);
 
-    ResponseEntity<Page<CarResponseDTO>> findAllFreeNotMarkAsDeleted(Pageable pageable);
+    ResponseEntity<Page<CarResponseDTO>> findAllFreeCars(Pageable pageable);
 
-    ResponseEntity<CarResponseDTO> save(CreateCarRequestDTO createCarRequestDTO);
+    ResponseEntity<CarResponseDTO> createNewCar(CreateCarRequestDTO createCarRequestDTO);
 
-    ResponseEntity<CarResponseDTO> update(UUID carId,
-                             UpdateCarRequestDTO updateCarRequestDTO);
+    ResponseEntity<CarResponseDTO> updateCar(UUID carId,
+                                             UpdateCarRequestDTO updateCarRequestDTO);
 
     ResponseEntity<CarResponseDTO> markCarAsDeleted(UUID carId);
 

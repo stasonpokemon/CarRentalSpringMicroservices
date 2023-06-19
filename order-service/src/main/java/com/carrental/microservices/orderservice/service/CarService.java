@@ -17,5 +17,5 @@ public interface CarService {
 
     CarResponseDTO findCarById(UUID carId);
 
-    CarResponseDTO findRepairedAndFreeCarById(UUID carId);
+    CarResponseDTO findFreeCarById(UUID carId);
 }

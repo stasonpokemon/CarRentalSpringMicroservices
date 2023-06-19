@@ -5,6 +5,7 @@ import com.carrental.microservices.carservice.domain.dto.request.CreateCarReques
 import com.carrental.microservices.carservice.domain.dto.request.UpdateCarRequestDTO;
 import com.carrental.microservices.carservice.domain.dto.response.CarResponseDTO;
 import com.carrental.microservices.carservice.domain.entity.Car;
+import com.carrental.microservices.carservice.domain.entity.CarStatus;
 import com.carrental.microservices.carservice.domain.mapper.CarMapper;
 import com.carrental.microservices.carservice.exception.BadRequestException;
 import com.carrental.microservices.carservice.exception.NotFoundException;
@@ -50,7 +51,8 @@ public class CarServiceImpl implements CarService {
         if (withMarkedAsDeleted) {
             carResponseDTO = carMapper.carToCarResponseDTO(findCarByIdOrThrowException(id));
         } else {
-            carResponseDTO = carMapper.carToCarResponseDTO(carRepository.findByIdAndDeleted(id, false)
+            carResponseDTO = carMapper
+                    .carToCarResponseDTO(carRepository.findByIdAndCarStatusIsNot(id, CarStatus.DELETED)
                     .orElseThrow(() -> new NotFoundException(Car.class, id)));
         }
 
@@ -61,7 +63,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<Page<CarResponseDTO>> findAll(Pageable pageable, Boolean withMarkedAsDeleted) {
+    public ResponseEntity<Page<CarResponseDTO>> findAllCars(Pageable pageable, Boolean withMarkedAsDeleted) {
 
         log.info("Finding all cars");
 
@@ -71,7 +73,7 @@ public class CarServiceImpl implements CarService {
         if (withMarkedAsDeleted) {
             cars = carRepository.findAll(pageable);
         } else {
-            cars = carRepository.findAllByDeleted(false, pageable);
+            cars = carRepository.findAllByCarStatusIsNot(CarStatus.DELETED, pageable);
         }
 
         Page<CarResponseDTO> carResponseDTOPage = new PageImpl<>(cars
@@ -86,12 +88,12 @@ public class CarServiceImpl implements CarService {
 
     @Override
     @Transactional(readOnly = true)
-    public ResponseEntity<Page<CarResponseDTO>> findAllFreeNotMarkAsDeleted(Pageable pageable) {
+    public ResponseEntity<Page<CarResponseDTO>> findAllFreeCars(Pageable pageable) {
 
         log.info("Finding all free not mark as deleted cars");
 
         Page<CarResponseDTO> carResponseDTOPage =
-                new PageImpl<>(carRepository.findAllByBusyAndDeleted(false, false, pageable)
+                new PageImpl<>(carRepository.findAllByCarStatus(CarStatus.FREE, pageable)
                         .stream()
                         .map(carMapper::carToCarResponseDTO)
                         .collect(Collectors.toList()));
@@ -102,24 +104,23 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public ResponseEntity<CarResponseDTO> save(CreateCarRequestDTO createCarRequestDTO) {
+    public ResponseEntity<CarResponseDTO> createNewCar(CreateCarRequestDTO createCarRequestDTO) {
 
         log.info("Saving car: {}", createCarRequestDTO);
 
         Car car = carMapper.createCarRequestDTOToCar(createCarRequestDTO);
         car.setDamageStatus("Without damage");
-        car.setBusy(false);
-        car.setDeleted(false);
-        Car savedCar = carRepository.save(car);
+        car.setCarStatus(CarStatus.FREE);
+        car = carRepository.save(car);
 
         log.info("Save car: {}", car);
 
-        return new ResponseEntity<>(carMapper.carToCarResponseDTO(savedCar), HttpStatus.OK);
+        return new ResponseEntity<>(carMapper.carToCarResponseDTO(car), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<CarResponseDTO> update(UUID id,
-                                                 UpdateCarRequestDTO updateCarRequestDTO) {
+    public ResponseEntity<CarResponseDTO> updateCar(UUID id,
+                                                    UpdateCarRequestDTO updateCarRequestDTO) {
 
         log.info("Updating car: {} with id: {}", updateCarRequestDTO, id);
 
@@ -138,17 +139,16 @@ public class CarServiceImpl implements CarService {
 
         Car car = findCarByIdOrThrowException(carId);
 
-        if (car.isDeleted()) {
+        if (car.getCarStatus().equals(CarStatus.DELETED)) {
             throw new BadRequestException(String.format("Unable to fix car. Car with id = %s is deleted", carId));
         }
 
-        if (!car.isBroken()) {
+        if (!car.getCarStatus().equals(CarStatus.BROKEN)) {
             throw new BadRequestException(String.format("Unable to fix car. Car with id = %s already fixed", carId));
         }
 
-        car.setBroken(false);
+        car.setCarStatus(CarStatus.FREE);
         car.setDamageStatus("Without damage");
-        car.setBusy(false);
 
         log.info("Fix broken car: {}", car);
 
@@ -164,16 +164,15 @@ public class CarServiceImpl implements CarService {
 
         Car car = findCarByIdOrThrowException(carId);
 
-        if (car.isBroken()) {
+        if (car.getCarStatus().equals(CarStatus.BROKEN)) {
             throw new BadRequestException(String.format("Car with id = %s is already broken", carId));
         }
 
-        if (car.isDeleted()) {
+        if (car.getCarStatus().equals(CarStatus.DELETED)) {
             throw new BadRequestException(String.format("Car with id = %s is deleted", carId));
         }
 
-        car.setBroken(true);
-        car.setBusy(true);
+        car.setCarStatus(CarStatus.BROKEN);
         car.setDamageStatus(damageStatus);
 
         log.info("Set the car: {} as broken", car);
@@ -186,20 +185,20 @@ public class CarServiceImpl implements CarService {
 
         log.info("Setting the car as busy with id: {}", carId);
 
-        Car car = carRepository.findByIdAndDeleted(carId, false)
+        Car car = carRepository.findByIdAndCarStatusIsNot(carId, CarStatus.DELETED)
                 .orElseThrow(() -> new NotFoundException(Car.class, carId));
 
         log.info("Found car: {}", car);
 
-        if (car.isBroken()) {
+        if (car.getCarStatus().equals(CarStatus.BROKEN)) {
             throw new BadRequestException(String.format("Car with id = %s is broken", carId));
         }
 
-        if (car.isBusy()) {
+        if (car.getCarStatus().equals(CarStatus.BUSY)) {
             throw new BadRequestException(String.format("Car with id = %s is busy now", carId));
         }
 
-        car.setBusy(true);
+        car.setCarStatus(CarStatus.BUSY);
 
         log.info("Set the car: {} as busy", car);
 
@@ -215,15 +214,15 @@ public class CarServiceImpl implements CarService {
 
         log.info("Found car: {}", car);
 
-        if (car.isBroken()) {
+        if (car.getCarStatus().equals(CarStatus.BROKEN)) {
             throw new BadRequestException(String.format("Car with id = %s is broken", carId));
         }
 
-        if (!car.isBusy()) {
+        if (!car.getCarStatus().equals(CarStatus.BUSY)) {
             throw new BadRequestException(String.format("Car with id = %s is free now", carId));
         }
 
-        car.setBusy(false);
+        car.setCarStatus(CarStatus.FREE);
 
         log.info("Set the car: {} as free", car);
 
@@ -238,12 +237,11 @@ public class CarServiceImpl implements CarService {
 
         Car car = findCarByIdOrThrowException(id);
 
-        if (car.isDeleted()) {
+        if (car.getCarStatus().equals(CarStatus.DELETED)) {
             throw new BadRequestException(String.format("Car with id = %s already marked as deleted", id));
         }
 
-        car.setDeleted(true);
-        car.setBusy(true);
+        car.setCarStatus(CarStatus.DELETED);
 
         log.info("Mark car: {} as deleted", car);
 

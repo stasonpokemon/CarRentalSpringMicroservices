@@ -27,28 +27,28 @@ public class CreateCarRequestDTO {
     @NotBlank(message = "Please fill the producer")
     @Length(max = 255, message = "Producer too long. Max length is 2048")
     @Schema(example = OpenApiConstants.CAR_PRODUCER, description = OpenApiConstants.CAR_PRODUCER_DESCRIPTION)
-    @JsonProperty(namespace = "producer")
+    @JsonProperty(value = "producer")
     private String producer;
 
     @NotBlank(message = "Please fill the model")
     @Length(max = 255, message = "Model too long. Max length is 2048")
     @Schema(example = OpenApiConstants.CAR_MODEL, description = OpenApiConstants.CAR_MODEL_DESCRIPTION)
-    @JsonProperty(namespace = "model")
+    @JsonProperty(value = "model")
     private String model;
 
     @NotNull(message = "Please fill the release date")
     @Schema(example = OpenApiConstants.CAR_RELEASE_DATE, description = OpenApiConstants.CAR_RELEASE_DATE_DESCRIPTION)
-    @JsonProperty(namespace = "release_date")
+    @JsonProperty(value = "release_date")
     private LocalDate releaseDate;
 
     @NotNull(message = "Please fill the price per day")
     @Min(value = 0, message = "Price per day can't be less than 0")
     @Schema(example = OpenApiConstants.CAR_PRICE_PER_DAY, description = OpenApiConstants.CAR_PRICE_PER_DAY_DESCRIPTION)
-    @JsonProperty(namespace = "price_per_day")
+    @JsonProperty(value = "price_per_day")
     private Double pricePerDay;
 
     @NotBlank(message = "Please fill the image link")
     @Schema(example = OpenApiConstants.CAR_IMAGE_LINK, description = OpenApiConstants.CAR_IMAGE_LINK_DESCRIPTION)
-    @JsonProperty(namespace = "image_link")
+    @JsonProperty(value = "image_link")
     private String imageLink;
 }

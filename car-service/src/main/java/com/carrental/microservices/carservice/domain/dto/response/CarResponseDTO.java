@@ -1,5 +1,6 @@
 package com.carrental.microservices.carservice.domain.dto.response;
 
+import com.carrental.microservices.carservice.domain.entity.CarStatus;
 import com.carrental.microservices.carservice.util.swagger.OpenApiConstants;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,9 +41,9 @@ public class CarResponseDTO {
     @JsonProperty(value = "price_per_day")
     private Double pricePerDay;
 
-    @Schema(example = OpenApiConstants.CAR_EMPLOYMENT_STATUS, description = OpenApiConstants.CAR_EMPLOYMENT_STATUS_DESCRIPTION)
-    @JsonProperty(value = "is_busy")
-    private boolean busy;
+    @Schema(example = OpenApiConstants.CAR_STATUS, description = OpenApiConstants.CAR_STATUS_DESCRIPTION)
+    @JsonProperty(value = "car_status")
+    private CarStatus carStatus;
 
     @Schema(example = OpenApiConstants.CAR_DAMAGE_STATUS, description = OpenApiConstants.CAR_DAMAGE_STATUS_DESCRIPTION)
     @JsonProperty(value = "damage_status")
@@ -51,8 +52,4 @@ public class CarResponseDTO {
     @Schema(example = OpenApiConstants.CAR_IMAGE_LINK, description = OpenApiConstants.CAR_IMAGE_LINK_DESCRIPTION)
     @JsonProperty(value = "image_link")
     private String imageLink;
-
-    @Schema(example = OpenApiConstants.CAR_BROKEN, description = OpenApiConstants.CAR_BROKEN_DESCRIPTION)
-    @JsonProperty(value = "is_broken")
-    private boolean broken;
 }

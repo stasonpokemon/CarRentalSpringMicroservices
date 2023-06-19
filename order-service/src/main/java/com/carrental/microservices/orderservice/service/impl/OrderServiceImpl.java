@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
 
         log.info("Found user: {}", user);
 
-        CarResponseDTO car = carService.findRepairedAndFreeCarById(carId);
+        CarResponseDTO car = carService.findFreeCarById(carId);
 
         log.info("Found car: {}", car);
 
